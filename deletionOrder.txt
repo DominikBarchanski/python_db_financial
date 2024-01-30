@@ -1,0 +1,8 @@
+products_list
+user_group_memberships
+expenses
+balances
+tokens
+user_groups
+product_category
+users

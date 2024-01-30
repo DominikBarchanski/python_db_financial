@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - user_microservice
+      - products_microservice
+      - balance_microservice
+    networks:
+      - mynetwork
+
+  shared-model:
+    build:
+      context: src/shared_models
+    ports:
+      - "8000:8000"
+    depends_on:
+        - database
+    environment:
+        - DATABASE_URL=postgresql://postgres:zaq12WSX@database:5432/postgres_services
+    networks:
+      - mynetwork
+
+  user_microservice:
+    build:
+      context: src/user_microservice
+    ports:
+      - "8001:8000"
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://postgres:zaq12WSX@database:5432/postgres_services
+    networks:
+      - mynetwork
+
+  products_microservice:
+    build:
+      context: src/products_microservice
+    ports:
+      - "8002:8000"
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://postgres:zaq12WSX@database:5432/postgres_services
+    networks:
+      - mynetwork
+
+  balance_microservice:
+    build:
+      context: src/balance_microservice
+    ports:
+      - "8003:8000"
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=postgresql://postgres:zaq12WSX@database:5432/postgres_services
+    networks:
+      - mynetwork
+
+  database:
+    build:
+      context: src/db_microservice
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: zaq12WSX
+      POSTGRES_DB: postgres_services
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
